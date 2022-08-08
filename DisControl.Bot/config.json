@@ -1,0 +1,12 @@
+{
+  "BotToken": null,
+  "GuildId": 0,
+  "LogsChannelId": 0,
+  "CommandsChannelId": 0,
+  "ApiToken": null,
+  "ApiUrl": null,
+  "ParentId": null,
+  "CurrentId": null,
+  "BotPrefix": null,
+  "AdminId": 0
+}
