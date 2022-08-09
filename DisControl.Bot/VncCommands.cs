@@ -13,6 +13,7 @@ using MarcusW.VncClient.Security;
 using Microsoft.Extensions.Logging.Abstractions;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using Spectre.Console;
 using Size = MarcusW.VncClient.Size;
 
 namespace DisControl.Bot;
@@ -42,9 +43,9 @@ public class VncCommands : BaseCommandModule
         public double HorizontalDpi => _size.Width;
         public double VerticalDpi => _size.Height;
 
-        internal FramebufferReference(byte[] bitmap, Size size)
+        internal unsafe FramebufferReference(byte[] bitmap, Size size)
         {
-            _address = GCHandle.Alloc(_bitmap, GCHandleType.Pinned).AddrOfPinnedObject();
+            _address = (IntPtr)_bitmap.AsMemory().Pin().Pointer;
             _bitmap = bitmap; _size = size;
         }
 
@@ -61,6 +62,7 @@ public class VncCommands : BaseCommandModule
         {
             byte[]? bitmap;
             if (Size == null) Size = size;
+            AnsiConsole.WriteLine($"Bitmap size is {Size.Width}x{Size.Height}");
             if (Bitmap == null || Size.Width != size.Width || Size.Height != size.Height) {
                 bitmap = new byte[size.Width * size.Height * Unsafe.SizeOf<Rgba32>()];
                 lock (_bitmapReplacementLock)
@@ -69,7 +71,7 @@ public class VncCommands : BaseCommandModule
                 Size = size;
             }
 
-            return new FramebufferReference(Bitmap!, size);
+            return new FramebufferReference(Bitmap, size);
         }
     }
     
