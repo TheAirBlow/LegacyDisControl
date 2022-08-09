@@ -212,7 +212,7 @@ public static class VMware
     private static async void StateThread()
     {
         while (true) {
-            state = GetState();
+            State = GetState();
             await Task.Delay(1000);
         }
     }
