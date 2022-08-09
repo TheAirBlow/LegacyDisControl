@@ -237,7 +237,7 @@ public class VncCommands : BaseCommandModule
         }
 
         if (!failed) {
-            await Task.Delay(1000);
+            await Task.Delay(2000);
             await ScreenAction(ctx, msg);
         }
     }
@@ -315,7 +315,7 @@ public class VncCommands : BaseCommandModule
         else msg = await ctx.RespondAsync(embed1);
         _connection?.SendMessageAsync(new KeyEventMessage(true, key));
         _connection?.SendMessageAsync(new KeyEventMessage(false, key));
-        await Task.Delay(1000);
+        await Task.Delay(2000);
         await ScreenAction(ctx, msg);
     }
 
@@ -385,7 +385,7 @@ public class VncCommands : BaseCommandModule
         }
         
         if (!failed) {
-            await Task.Delay(1000);
+            await Task.Delay(2000);
             await ScreenAction(ctx, msg);
         }
     }
@@ -426,7 +426,7 @@ public class VncCommands : BaseCommandModule
         if (msg != null!) msg = await msg!.ModifyAsync(embed1);
         else msg = await ctx.RespondAsync(embed1);
         _connection?.SendMessageAsync(new PointerEventMessage(new Position(x, y), button));
-        await Task.Delay(1000);
+        await Task.Delay(2000);
         await ScreenAction(ctx, msg);
     }
 
