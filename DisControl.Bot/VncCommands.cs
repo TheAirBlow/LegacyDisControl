@@ -62,8 +62,7 @@ public class VncCommands : BaseCommandModule
         {
             byte[]? bitmap;
             if (Size == null) Size = size;
-            AnsiConsole.WriteLine($"Bitmap size is {Size.Width}x{Size.Height}");
-            if (Bitmap == null || Size.Width != size.Width || Size.Height != size.Height) {
+            if (Bitmap == null || Size != size) {
                 bitmap = new byte[size.Width * size.Height * Unsafe.SizeOf<Rgba32>()];
                 lock (_bitmapReplacementLock)
                     Bitmap = bitmap;
@@ -158,6 +157,7 @@ public class VncCommands : BaseCommandModule
         else msg = await ctx.RespondAsync(embed2);
         if (File.Exists("image.png"))
             File.Delete("image.png");
+        AnsiConsole.WriteLine(string.Join(", ", _target.Bitmap));
         using (var image = Image.LoadPixelData<Rgba32>(_target.Bitmap, _target.Size.Width, _target.Size.Height))
             await image.SaveAsPngAsync("image.png");
         var embed3 = new DiscordEmbedBuilder()
