@@ -33,16 +33,20 @@ public class VncCommands : BaseCommandModule
     private sealed class FramebufferReference : IFramebufferReference, IDisposable
     {
         private volatile byte[]? _bitmap;
+        private IntPtr _address;
         private Size _size;
         
-        public IntPtr Address => GCHandle.Alloc(_bitmap, GCHandleType.Pinned).AddrOfPinnedObject();
+        public IntPtr Address => _address;
         public Size Size => _size;
         public PixelFormat Format => PixelFormat.Plain;
         public double HorizontalDpi => 1;
         public double VerticalDpi => 1;
 
         internal FramebufferReference(byte[] bitmap, Size size)
-            => _bitmap = bitmap;
+        {
+            _address = GCHandle.Alloc(_bitmap, GCHandleType.Pinned).AddrOfPinnedObject();
+            _bitmap = bitmap; _size = size;
+        }
 
         public void Dispose() { }
     }
