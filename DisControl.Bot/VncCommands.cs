@@ -89,7 +89,7 @@ public class VncCommands : BaseCommandModule
             _connection = await _client.ConnectAsync(new ConnectParameters {
                 ConnectTimeout = TimeSpan.FromSeconds(5),
                 MaxReconnectAttempts = 5,
-                AuthenticationHandler = new Authentica,
+                AuthenticationHandler = new DemoAuthenticationHandler(),
                 TransportParameters = new TcpTransportParameters {
                     Host = VMware.GetHostIP(),
                     Port = 5901
