@@ -231,7 +231,7 @@ public class VncCommands : BaseCommandModule
                 .WithColor(DiscordColor.Red)
                 .WithTitle("DisControl | Error")
                 .AddField("Message", $"Unable to parse {e.Message}!")
-                .AddField("Additional", "[Click here](https://bit.ly/3MnPT4u)")
+                .AddField("Additional", "[Click here](https://bit.ly/3dji1Zx)")
                 .Build();
             await msg.ModifyAsync(embed);
             failed = true;
@@ -248,7 +248,7 @@ public class VncCommands : BaseCommandModule
     }
     
     [Command("enter")]
-    [Description("Press NumPad Enter key on the VM")]
+    [Description("Press Enter key on the VM")]
     [Cooldown(1, 5, CooldownBucketType.Global)]
     public async Task Enter(CommandContext ctx)
     {
@@ -295,8 +295,8 @@ public class VncCommands : BaseCommandModule
         await msg.ModifyAsync(embed2);
     }
     
-    [Command("enter")]
-    [Description("Press NumPad Enter key on the VM")]
+    [Command("rm")]
+    [Description("Press Backspace key on the VM")]
     [Cooldown(1, 5, CooldownBucketType.Global)]
     public async Task Backspace(CommandContext ctx, [Description("How many times")] int count)
     {
@@ -399,7 +399,7 @@ public class VncCommands : BaseCommandModule
                 .WithColor(DiscordColor.Red)
                 .WithTitle("DisControl | Error")
                 .AddField("Message", $"Unable to parse {e.Message}!")
-                .AddField("Additional", "[Click here](https://bit.ly/3MnPT4u)")
+                .AddField("Additional", "[Click here](https://bit.ly/3dji1Zx)")
                 .Build();
             await msg.ModifyAsync(embed);
             failed = true;
@@ -539,7 +539,6 @@ public class VncCommands : BaseCommandModule
             (msg, var error) = await Connect(ctx);
             if (error) return;
         }
-
         var embed1 = new DiscordEmbedBuilder()
             .WithColor(DiscordColor.Yellow)
             .WithTitle("DisControl | Right Click")
