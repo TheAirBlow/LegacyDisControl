@@ -97,15 +97,7 @@ public class VncCommands : BaseCommandModule
             _connection.RenderTarget = _target;
         }
         catch (Exception e) {
-            AnsiConsole.MarkupLine("[red]Unable to connect to VNC![/]");
-            AnsiConsole.WriteException(e);
-            var embed = new DiscordEmbedBuilder()
-                .WithColor(DiscordColor.Red)
-                .WithTitle("DisControl | Error")
-                .AddField("Message", "VNC Connection failed: An exception occured!")
-                .AddField("Additional", "See logs for more information.")
-                .Build();
-            await message.ModifyAsync(embed);
+            await message.ModifyAsync($"```csharp\n{e}```");
             return (message, true);
         }
         
