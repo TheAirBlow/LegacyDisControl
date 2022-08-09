@@ -1,4 +1,6 @@
 ﻿using System.Collections.Immutable;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
@@ -9,8 +11,8 @@ using MarcusW.VncClient.Protocol.SecurityTypes;
 using MarcusW.VncClient.Rendering;
 using MarcusW.VncClient.Security;
 using Microsoft.Extensions.Logging.Abstractions;
-using SkiaSharp;
-using Spectre.Console;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using Size = MarcusW.VncClient.Size;
 
 namespace DisControl.Bot;
@@ -28,46 +30,42 @@ public class VncCommands : BaseCommandModule
         }
     }
     
-    private sealed class FramebufferReference : IFramebufferReference
+    private sealed class FramebufferReference : IFramebufferReference, IDisposable
     {
-        private volatile SKBitmap? _bitmap;
+        private volatile byte[]? _bitmap;
+        private Size _size;
         
-        public IntPtr Address => _bitmap?.GetPixels() ?? throw new ObjectDisposedException(nameof(FramebufferReference));
-        public Size Size => new Size(_bitmap?.Width ?? throw new ObjectDisposedException(nameof(FramebufferReference)), 
-            _bitmap?.Height ?? throw new ObjectDisposedException(nameof(FramebufferReference)));
-        public PixelFormat Format => Conversions.GetPixelFormat(_bitmap?.ColorType ?? throw new ObjectDisposedException(nameof(FramebufferReference)));
+        public IntPtr Address => GCHandle.Alloc(_bitmap, GCHandleType.Pinned).AddrOfPinnedObject();
+        public Size Size => _size;
+        public PixelFormat Format => PixelFormat.Plain;
         public double HorizontalDpi => 1;
         public double VerticalDpi => 1;
 
-        internal FramebufferReference(SKBitmap bitmap)
-        {
-            _bitmap = bitmap;
-        }
-        
-        public void Dispose()
-            => _bitmap?.Dispose();
+        internal FramebufferReference(byte[] bitmap, Size size)
+            => _bitmap = bitmap;
+
+        public void Dispose() { }
     }
     
     private class RenderTarget : IRenderTarget
     {
-        public volatile SKBitmap? _bitmap;
         private readonly object _bitmapReplacementLock = new();
+        public volatile byte[] Bitmap;
+        public Size Size;
 
         public IFramebufferReference GrabFramebufferReference(Size size, IImmutableSet<Screen> layout)
         {
-            bool sizeChanged = _bitmap == null || _bitmap.Width != size.Width || _bitmap.Height != size.Height;
+            byte[]? bitmap;
+            if (Size == null) Size = size;
+            if (Bitmap == null || Size.Width != size.Width || Size.Height != size.Height) {
+                bitmap = new byte[size.Width * size.Height * Unsafe.SizeOf<Rgba32>()];
+                lock (_bitmapReplacementLock)
+                    Bitmap = bitmap;
 
-            SKBitmap bitmap;
-            if (sizeChanged) {
-                bitmap = new SKBitmap(size.Width, size.Height);
-                
-                lock (_bitmapReplacementLock) {
-                    _bitmap?.Dispose();
-                    _bitmap = bitmap;
-                }
+                Size = size;
             }
 
-            return new FramebufferReference(_bitmap!);
+            return new FramebufferReference(Bitmap!, size);
         }
     }
     
@@ -156,7 +154,8 @@ public class VncCommands : BaseCommandModule
             File.Delete("image.png");
         var stream = new FileStream("image.png", 
             FileMode.CreateNew, FileAccess.ReadWrite);
-        SKImage.FromBitmap(_target._bitmap).Encode(SKEncodedImageFormat.Png, 100).SaveTo(stream);
+        using (var image = Image.LoadPixelData<Rgba32>(_target.Bitmap, _target.Size.Width, _target.Size.Height))
+            image.SaveAsPng(stream);
         var embed3 = new DiscordEmbedBuilder()
             .WithColor(DiscordColor.Yellow)
             .WithTitle("DisControl | Screenshot")
