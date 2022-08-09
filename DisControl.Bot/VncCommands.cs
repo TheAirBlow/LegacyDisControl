@@ -157,7 +157,7 @@ public class VncCommands : BaseCommandModule
         else msg = await ctx.RespondAsync(embed2);
         if (File.Exists("image.png"))
             File.Delete("image.png");
-        AnsiConsole.WriteLine(string.Join(", ", _target.Bitmap));
+        File.WriteAllBytes("data.bin", _target.Bitmap);
         using (var image = Image.LoadPixelData<Rgba32>(_target.Bitmap, _target.Size.Width, _target.Size.Height))
             await image.SaveAsPngAsync("image.png");
         var embed3 = new DiscordEmbedBuilder()
