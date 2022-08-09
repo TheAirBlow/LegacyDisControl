@@ -1,6 +1,5 @@
-﻿using System.Globalization;
-using System.Text;
-using RemoteViewing.Vnc;
+﻿using System.Text;
+using MarcusW.VncClient;
 using Spectre.Console;
 
 namespace DisControl.Bot;
@@ -28,12 +27,12 @@ public static class DataSet
         AnsiConsole.MarkupLine("[green]Task successfully finished![/]");
     }
 
-    public static KeySym FromUnicode(char input)
+    public static KeySymbol FromUnicode(char input)
     {
         var bytes = Encoding.UTF8.GetBytes(input.ToString());
         bytes = AddEmptyBytes(bytes); var str = BitConverter.ToString(bytes);
         str = str.Replace("-", "");
-        return (KeySym)_conversionList[Convert.ToInt32(str, 16)];
+        return (KeySymbol)_conversionList[Convert.ToInt32(str, 16)];
     }
 
     private static byte[] AddEmptyBytes(byte[] input)

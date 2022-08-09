@@ -14,7 +14,7 @@ public static class Ngrok
     public static void StartTunnel()
     {
         Client = new();
-        var address = $"{VMWare.GetHostIP()}:5900";
+        var address = $"{VMware.GetHostIP()}:5900";
         Tunnel = Client.StartTunnel(new TunnelConfiguration(
             "DisControl", "tcp", 
             $"{address}") {

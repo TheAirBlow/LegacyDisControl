@@ -11,14 +11,12 @@
       <PackageReference Include="DSharpPlus" Version="4.1.0" />
       <PackageReference Include="DSharpPlus.CommandsNext" Version="4.1.0" />
       <PackageReference Include="DSharpPlus.Interactivity" Version="4.1.0" />
+      <PackageReference Include="MarcusW.VncClient" Version="1.0.0-alpha4" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
       <PackageReference Include="Ngrok.AgentAPI" Version="0.1.0" />
-      <PackageReference Include="Quamotion.RemoteViewing" Version="1.1.184" />
-      <PackageReference Include="Quamotion.RemoteViewing.Windows.Forms" Version="1.1.184" />
-      <PackageReference Include="Quamotion.TurboJpegWrapper" Version="2.0.21" />
-      <PackageReference Include="Quamotion.TurboJpegWrapper.Drawing" Version="2.0.21" />
+      <PackageReference Include="Serilog" Version="2.12.0-dev-01492" />
+      <PackageReference Include="SkiaSharp" Version="2.88.1-preview.91" />
       <PackageReference Include="Spectre.Console" Version="0.43.0" />
-      <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
     </ItemGroup>
 
 </Project>

@@ -1,5 +1,4 @@
-﻿using DisControl.Bot.Attributes;
-using DSharpPlus.CommandsNext;
+﻿using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using Spectre.Console;
@@ -8,10 +7,20 @@ namespace DisControl.Bot;
 
 public class NgrokCommands : BaseCommandModule
 {
-    [Command("tunnelstart")] [AdminOnly]
+    [Command("tunnelstart")]
     [Description("Start ngrok tunnel")]
     public async Task StartTunnel(CommandContext ctx)
     {
+        if (!Configuration.Config.AdminId.Contains(ctx.Member.Id)) {
+            var error = new DiscordEmbedBuilder()
+                .WithColor(DiscordColor.Yellow)
+                .WithTitle("DisControl | Error")
+                .WithDescription("You're not an admin, fuck off")
+                .Build();
+            await ctx.RespondAsync(error);
+            return;
+        }
+
         if (!string.IsNullOrEmpty(Ngrok.Tunnel.PublicUrl)) {
             var embed = new DiscordEmbedBuilder()
                 .WithColor(DiscordColor.Red)
@@ -57,10 +66,20 @@ public class NgrokCommands : BaseCommandModule
         await message.ModifyAsync(embed4);
     }
     
-    [Command("tunnelstop")] [AdminOnly]
+    [Command("tunnelstop")]
     [Description("Stop ngrok tunnel")]
     public async Task StopTunnel(CommandContext ctx)
     {
+        if (!Configuration.Config.AdminId.Contains(ctx.Member.Id)) {
+            var error = new DiscordEmbedBuilder()
+                .WithColor(DiscordColor.Yellow)
+                .WithTitle("DisControl | Error")
+                .WithDescription("You're not an admin, fuck off")
+                .Build();
+            await ctx.RespondAsync(error);
+            return;
+        }
+
         if (string.IsNullOrEmpty(Ngrok.Tunnel.PublicUrl)) {
             var embed = new DiscordEmbedBuilder()
                 .WithColor(DiscordColor.Red)

@@ -27,9 +27,9 @@ public static class AutoRestart
             if (_stop || string.IsNullOrEmpty(Configuration.Config.CurrentId)) return;
             await Task.Delay(5000);
             try { 
-                var state = VMWare.GetState();
-                if (state == VMWare.PowerState.poweredOff)
-                    await VMWare.SetState("on");
+                var state = VMware.GetState();
+                if (state == VMware.PowerState.poweredOff)
+                    await VMware.SetState("on");
                 await DiscordLogs.SendEmbed(new DiscordEmbedBuilder()
                     .WithColor(DiscordColor.Green)
                     .WithTitle("DisControl | Auto Restart")

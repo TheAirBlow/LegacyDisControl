@@ -1,4 +1,5 @@
 ﻿using System.Collections.Specialized;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using DSharpPlus.Entities;
 using Newtonsoft.Json;
@@ -8,7 +9,8 @@ using Spectre.Console;
 namespace DisControl.Bot;
 
 // ReSharper disable once InconsistentNaming
-public static class VMWare
+[SuppressMessage("ReSharper", "InconsistentNaming")]
+public static class VMware
 {
     private static bool _currentFound;
     private static bool _parentFound;
@@ -111,7 +113,7 @@ public static class VMWare
         Configuration.SaveConfiguration();
         AnsiConsole.MarkupLine($"[green]Current VM has been successfully deleted![/]");
     }
-
+    
     public enum PowerState { poweredOn, poweredOff, paused, suspended, resetting }
 
     private class PowerStateJson

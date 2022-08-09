@@ -1,5 +1,4 @@
-﻿using DisControl.Bot.Attributes;
-using DSharpPlus;
+﻿using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Exceptions;
 using DSharpPlus.Entities;
@@ -39,45 +38,6 @@ public static class Discord
     private static async Task CommandErroredHandler(CommandsNextExtension _, CommandErrorEventArgs e)
     {
         switch (e.Exception) {
-            case ChecksFailedException ex1:
-                var failedChecks = ex1.FailedChecks;
-                foreach (var failedCheck in failedChecks) {
-                    switch (failedCheck) {
-                        case AdminOnlyAttribute:
-                            var embed = new DiscordEmbedBuilder()
-                                .WithColor(DiscordColor.Red)
-                                .WithTitle("DisControl | Error")
-                                .AddField("Message", "You are not an admin!")
-                                .Build();
-                            await e.Context.RespondAsync(embed);
-                            return;
-                        case CurrentIdSetAttribute:
-                            var embed1 = new DiscordEmbedBuilder()
-                                .WithColor(DiscordColor.Red)
-                                .WithTitle("DisControl | Error")
-                                .AddField("Message", "Current ID is not set!")
-                                .Build();
-                            await e.Context.RespondAsync(embed1);
-                            return;
-                        case ParentIdSetAttribute:
-                            var embed2 = new DiscordEmbedBuilder()
-                                .WithColor(DiscordColor.Red)
-                                .WithTitle("DisControl | Error")
-                                .AddField("Message", "Parent ID is not set!")
-                                .Build();
-                            await e.Context.RespondAsync(embed2);
-                            return;
-                        case VMPoweredOnAttribute:
-                            var embed3 = new DiscordEmbedBuilder()
-                                .WithColor(DiscordColor.Red)
-                                .WithTitle("DisControl | Error")
-                                .AddField("Message", "VM is not powered on!")
-                                .Build();
-                            await e.Context.RespondAsync(embed3);
-                            return;
-                    }
-                }
-                return;
             case CommandNotFoundException:
                 var p = Configuration.Config.BotPrefix;
                 var embed4 = new DiscordEmbedBuilder()
