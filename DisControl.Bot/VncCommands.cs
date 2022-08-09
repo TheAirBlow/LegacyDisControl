@@ -277,7 +277,7 @@ public class VncCommands : BaseCommandModule
             (msg, var error) = await Connect(ctx);
             if (error) return;
         }
-
+        
         var embed1 = new DiscordEmbedBuilder()
             .WithColor(DiscordColor.Yellow)
             .WithTitle("DisControl | Enter")

@@ -9,15 +9,15 @@ public static class Ngrok
     public static TunnelDetail Tunnel = new();
 
     private static void Handler(object? sender, EventArgs e)
-        => Client.StopTunnel("DisControl VNC");
+        => Client.StopTunnel("DisControl");
 
     public static void StartTunnel()
     {
         Client = new();
-        var address = $"{VMware.GetHostIP()}:5900";
+        var address = $"{VMware.GetHostIP()}:5901";
+        AnsiConsole.WriteLine(address);
         Tunnel = Client.StartTunnel(new TunnelConfiguration(
-            "DisControl", "tcp", 
-            $"{address}") {
+            "DisControl", "tcp", address) {
             HostHeader = address
         });
         AppDomain.CurrentDomain.ProcessExit += Handler;
