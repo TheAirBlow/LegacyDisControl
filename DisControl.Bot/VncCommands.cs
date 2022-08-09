@@ -109,7 +109,7 @@ public class VncCommands : BaseCommandModule
     [Cooldown(1, 5, CooldownBucketType.Global)]
     public async Task Screen(CommandContext ctx)
     {
-        if (!string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
+        if (string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
             var error = new DiscordEmbedBuilder()
                 .WithColor(DiscordColor.Yellow)
                 .WithTitle("DisControl | Error")
@@ -171,7 +171,7 @@ public class VncCommands : BaseCommandModule
     [Cooldown(1, 5, CooldownBucketType.Global)]
     public async Task KeyCombo(CommandContext ctx, [Description("Keys to press")] params string[] keys)
     {
-        if (!string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
+        if (string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
             var error = new DiscordEmbedBuilder()
                 .WithColor(DiscordColor.Yellow)
                 .WithTitle("DisControl | Error")
@@ -244,7 +244,7 @@ public class VncCommands : BaseCommandModule
     [Cooldown(1, 5, CooldownBucketType.Global)]
     public async Task Enter(CommandContext ctx)
     {
-        if (!string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
+        if (string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
             var error = new DiscordEmbedBuilder()
                 .WithColor(DiscordColor.Yellow)
                 .WithTitle("DisControl | Error")
@@ -292,7 +292,7 @@ public class VncCommands : BaseCommandModule
     [Cooldown(1, 5, CooldownBucketType.Global)]
     public async Task Backspace(CommandContext ctx, [Description("How many times")] int count)
     {
-        if (!string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
+        if (string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
             var error = new DiscordEmbedBuilder()
                 .WithColor(DiscordColor.Yellow)
                 .WithTitle("DisControl | Error")
@@ -344,7 +344,7 @@ public class VncCommands : BaseCommandModule
     [Cooldown(1, 5, CooldownBucketType.Global)]
     public async Task Print(CommandContext ctx, [RemainingText] [Description("Text to print")] string text)
     {
-        if (!string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
+        if (string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
             var error = new DiscordEmbedBuilder()
                 .WithColor(DiscordColor.Yellow)
                 .WithTitle("DisControl | Error")
@@ -412,7 +412,7 @@ public class VncCommands : BaseCommandModule
     [Cooldown(1, 2, CooldownBucketType.Global)]
     public async Task Mouse(CommandContext ctx, [Description("Mouse X position")] int x, [Description("Mouse Y position")] int y)
     {
-        if (!string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
+        if (string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
             var error = new DiscordEmbedBuilder()
                 .WithColor(DiscordColor.Yellow)
                 .WithTitle("DisControl | Error")
@@ -459,7 +459,7 @@ public class VncCommands : BaseCommandModule
     [Cooldown(1, 2, CooldownBucketType.Global)]
     public async Task LeftClick(CommandContext ctx, [Description("Mouse X position")] int x, [Description("Mouse Y position")] int y)
     {
-        if (!string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
+        if (string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
             var error = new DiscordEmbedBuilder()
                 .WithColor(DiscordColor.Yellow)
                 .WithTitle("DisControl | Error")
@@ -506,7 +506,7 @@ public class VncCommands : BaseCommandModule
     [Cooldown(1, 2, CooldownBucketType.Global)]
     public async Task RightClick(CommandContext ctx, [Description("Mouse X position")] int x, [Description("Mouse Y position")] int y)
     {
-        if (!string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
+        if (string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
             var error = new DiscordEmbedBuilder()
                 .WithColor(DiscordColor.Yellow)
                 .WithTitle("DisControl | Error")
@@ -553,7 +553,7 @@ public class VncCommands : BaseCommandModule
     [Cooldown(1, 2, CooldownBucketType.Global)]
     public async Task MiddleClick(CommandContext ctx, [Description("Mouse X position")] int x, [Description("Mouse Y position")] int y)
     {
-        if (!string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
+        if (string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
             var error = new DiscordEmbedBuilder()
                 .WithColor(DiscordColor.Yellow)
                 .WithTitle("DisControl | Error")
@@ -600,7 +600,7 @@ public class VncCommands : BaseCommandModule
     [Cooldown(1, 2, CooldownBucketType.Global)]
     public async Task ScrollUp(CommandContext ctx, [Description("Mouse X position")] int x, [Description("Mouse Y position")] int y)
     {
-        if (!string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
+        if (string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
             var error = new DiscordEmbedBuilder()
                 .WithColor(DiscordColor.Yellow)
                 .WithTitle("DisControl | Error")
@@ -647,7 +647,7 @@ public class VncCommands : BaseCommandModule
     [Cooldown(1, 2, CooldownBucketType.Global)]
     public async Task ScrollDown(CommandContext ctx, [Description("Mouse X position")] int x, [Description("Mouse Y position")] int y)
     {
-        if (!string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
+        if (string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
             var error = new DiscordEmbedBuilder()
                 .WithColor(DiscordColor.Yellow)
                 .WithTitle("DisControl | Error")

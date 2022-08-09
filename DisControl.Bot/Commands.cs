@@ -24,7 +24,7 @@ public class Commands : BaseCommandModule
             return;
         }
 
-        if (!string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
+        if (string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
             var error = new DiscordEmbedBuilder()
                 .WithColor(DiscordColor.Yellow)
                 .WithTitle("DisControl | Error")
@@ -49,7 +49,7 @@ public class Commands : BaseCommandModule
     [Description("Current VM's information")]
     public async Task Info(CommandContext ctx)
     {
-        if (!string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
+        if (string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
             var error = new DiscordEmbedBuilder()
                 .WithColor(DiscordColor.Yellow)
                 .WithTitle("DisControl | Error")
@@ -115,7 +115,7 @@ public class Commands : BaseCommandModule
             return;
         }
 
-        if (!string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
+        if (string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
             var error = new DiscordEmbedBuilder()
                 .WithColor(DiscordColor.Yellow)
                 .WithTitle("DisControl | Error")
@@ -219,7 +219,7 @@ public class Commands : BaseCommandModule
             return;
         }
 
-        if (!string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
+        if (string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
             var error = new DiscordEmbedBuilder()
                 .WithColor(DiscordColor.Yellow)
                 .WithTitle("DisControl | Error")
@@ -229,7 +229,7 @@ public class Commands : BaseCommandModule
             return;
         }
         
-        if (!string.IsNullOrEmpty(Configuration.Config.ParentId)) {
+        if (string.IsNullOrEmpty(Configuration.Config.ParentId)) {
             var error = new DiscordEmbedBuilder()
                 .WithColor(DiscordColor.Yellow)
                 .WithTitle("DisControl | Error")
@@ -277,7 +277,7 @@ public class Commands : BaseCommandModule
             return;
         }
 
-        if (!string.IsNullOrEmpty(Configuration.Config.ParentId)) {
+        if (string.IsNullOrEmpty(Configuration.Config.ParentId)) {
             var error = new DiscordEmbedBuilder()
                 .WithColor(DiscordColor.Yellow)
                 .WithTitle("DisControl | Error")
@@ -325,7 +325,7 @@ public class Commands : BaseCommandModule
             return;
         }
 
-        if (!string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
+        if (string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
             var error = new DiscordEmbedBuilder()
                 .WithColor(DiscordColor.Yellow)
                 .WithTitle("DisControl | Error")
@@ -335,7 +335,7 @@ public class Commands : BaseCommandModule
             return;
         }
         
-        if (!string.IsNullOrEmpty(Configuration.Config.ParentId)) {
+        if (string.IsNullOrEmpty(Configuration.Config.ParentId)) {
             var error = new DiscordEmbedBuilder()
                 .WithColor(DiscordColor.Yellow)
                 .WithTitle("DisControl | Error")
