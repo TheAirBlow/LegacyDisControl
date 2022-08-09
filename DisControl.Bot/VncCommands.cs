@@ -152,18 +152,18 @@ public class VncCommands : BaseCommandModule
         else msg = await ctx.RespondAsync(embed2);
         if (File.Exists("image.png"))
             File.Delete("image.png");
-        var stream = new FileStream("image.png", 
-            FileMode.CreateNew, FileAccess.ReadWrite);
         using (var image = Image.LoadPixelData<Rgba32>(_target.Bitmap, _target.Size.Width, _target.Size.Height))
-            image.SaveAsPng(stream);
+            await image.SaveAsPngAsync("image.png");
         var embed3 = new DiscordEmbedBuilder()
             .WithColor(DiscordColor.Yellow)
             .WithTitle("DisControl | Screenshot")
             .AddField("Status", "Uploading...")
             .Build();
         await msg.ModifyAsync(embed3);
+        var stream = new FileStream("image.png", 
+            FileMode.Open, FileAccess.ReadWrite);
         var file = new DiscordMessageBuilder()
-            .WithFile(stream);
+            .WithFile("screenshot.png", stream);
         await msg.ModifyAsync(file);
         await msg.ModifyEmbedSuppressionAsync(true);
         await stream.DisposeAsync();
