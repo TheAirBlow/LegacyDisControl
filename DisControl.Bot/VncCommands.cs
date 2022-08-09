@@ -62,7 +62,7 @@ public class VncCommands : BaseCommandModule
             byte[]? bitmap;
             if (Size == null) Size = size;
             if (Bitmap == null || Size != size) {
-                bitmap = new byte[size.Width * size.Height * Unsafe.SizeOf<Rgba32>()];
+                bitmap = new byte[size.Width * size.Height * Unsafe.SizeOf<Argb32>()];
                 lock (_bitmapReplacementLock)
                     Bitmap = bitmap;
 
@@ -147,7 +147,6 @@ public class VncCommands : BaseCommandModule
             return;
         
         _screen = true;
-        AnsiConsole.WriteLine(_connection?.RemoteFramebufferFormat.Name!);
         var embed2 = new DiscordEmbedBuilder()
             .WithColor(DiscordColor.Yellow)
             .WithTitle("DisControl | Screenshot")
@@ -157,7 +156,7 @@ public class VncCommands : BaseCommandModule
         else msg = await ctx.RespondAsync(embed2);
         if (File.Exists("image.png"))
             File.Delete("image.png");
-        using (var image = Image.LoadPixelData<Rgba32>(_target.Bitmap, _target.Size.Width, _target.Size.Height))
+        using (var image = Image.LoadPixelData<Argb32>(_target.Bitmap, _target.Size.Width, _target.Size.Height))
             await image.SaveAsPngAsync("image.png");
         var embed3 = new DiscordEmbedBuilder()
             .WithColor(DiscordColor.Yellow)
