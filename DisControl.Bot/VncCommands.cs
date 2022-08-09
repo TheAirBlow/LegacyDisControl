@@ -39,8 +39,8 @@ public class VncCommands : BaseCommandModule
         public IntPtr Address => _address;
         public Size Size => _size;
         public PixelFormat Format => PixelFormat.Plain;
-        public double HorizontalDpi => 1;
-        public double VerticalDpi => 1;
+        public double HorizontalDpi => _size.Width;
+        public double VerticalDpi => _size.Height;
 
         internal FramebufferReference(byte[] bitmap, Size size)
         {
