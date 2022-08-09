@@ -152,12 +152,11 @@ public class VncCommands : BaseCommandModule
             .Build();
         if (msg != null!) msg = await msg!.ModifyAsync(embed2);
         else msg = await ctx.RespondAsync(embed2);
-        if (File.Exists("image.jpg"))
-            File.Delete("image.jpg");
-        var stream = new FileStream("image.jpg", 
+        if (File.Exists("image.png"))
+            File.Delete("image.png");
+        var stream = new FileStream("image.png", 
             FileMode.CreateNew, FileAccess.ReadWrite);
-        using var wstream = new SKManagedWStream(stream);
-        _target._bitmap?.Encode(wstream, SKEncodedImageFormat.Jpeg, 0);
+        SKImage.FromBitmap(_target._bitmap).Encode(SKEncodedImageFormat.Png, 100).SaveTo(stream);
         var embed3 = new DiscordEmbedBuilder()
             .WithColor(DiscordColor.Yellow)
             .WithTitle("DisControl | Screenshot")
