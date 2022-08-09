@@ -68,7 +68,7 @@ public class Commands : BaseCommandModule
         
         var power = "";
         var color = DiscordColor.Aquamarine;
-        switch (VMware.GetState()) {
+        switch (VMware.State) {
             case VMware.PowerState.paused:
                 color = DiscordColor.Yellow;
                 power = "Paused";

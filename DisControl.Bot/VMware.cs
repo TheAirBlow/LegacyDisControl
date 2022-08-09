@@ -14,6 +14,7 @@ public static class VMware
 {
     private static bool _currentFound;
     private static bool _parentFound;
+    public static PowerState State;
     
     /// <summary>
     /// Send an API request
@@ -208,6 +209,14 @@ public static class VMware
         }
     }
 
+    private static async void StateThread()
+    {
+        while (true) {
+            state = GetState();
+            await Task.Delay(1000);
+        }
+    }
+
     public static void Initialize()
     {
         AnsiConsole.MarkupLine("[cyan]Task: Verifying VMWare API data...[/]");
@@ -216,5 +225,7 @@ public static class VMware
             AnsiConsole.MarkupLine("[red]Task Failed: An exception occured.[/]");
             AnsiConsole.WriteException(e); Console.ReadKey(); Environment.Exit(0);
         }
+        
+        new Thread(StateThread).Start();
     }
 }

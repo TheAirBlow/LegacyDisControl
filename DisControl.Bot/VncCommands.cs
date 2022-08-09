@@ -163,7 +163,7 @@ public class VncCommands : BaseCommandModule
             return;
         }
 
-        if (VMware.GetState() != VMware.PowerState.poweredOn) {
+        if (VMware.State != VMware.PowerState.poweredOn) {
             var error = new DiscordEmbedBuilder()
                 .WithColor(DiscordColor.Yellow)
                 .WithTitle("DisControl | Error")
@@ -188,7 +188,7 @@ public class VncCommands : BaseCommandModule
             return;
         }
 
-        if (VMware.GetState() != VMware.PowerState.poweredOn) {
+        if (VMware.State != VMware.PowerState.poweredOn) {
             var error = new DiscordEmbedBuilder()
                 .WithColor(DiscordColor.Yellow)
                 .WithTitle("DisControl | Error")
@@ -236,7 +236,10 @@ public class VncCommands : BaseCommandModule
             failed = true;
         }
 
-        if (!failed) await ScreenAction(ctx, msg);
+        if (!failed) {
+            await Task.Delay(1000);
+            await ScreenAction(ctx, msg);
+        }
     }
 
     [Command("keycombo")] [Aliases("key", "k")]
@@ -287,7 +290,7 @@ public class VncCommands : BaseCommandModule
             return;
         }
 
-        if (VMware.GetState() != VMware.PowerState.poweredOn) {
+        if (VMware.State != VMware.PowerState.poweredOn) {
             var error = new DiscordEmbedBuilder()
                 .WithColor(DiscordColor.Yellow)
                 .WithTitle("DisControl | Error")
@@ -312,6 +315,7 @@ public class VncCommands : BaseCommandModule
         else msg = await ctx.RespondAsync(embed1);
         _connection?.SendMessageAsync(new KeyEventMessage(true, key));
         _connection?.SendMessageAsync(new KeyEventMessage(false, key));
+        await Task.Delay(1000);
         await ScreenAction(ctx, msg);
     }
 
@@ -348,7 +352,7 @@ public class VncCommands : BaseCommandModule
             return;
         }
 
-        if (VMware.GetState() != VMware.PowerState.poweredOn) {
+        if (VMware.State != VMware.PowerState.poweredOn) {
             var error = new DiscordEmbedBuilder()
                 .WithColor(DiscordColor.Yellow)
                 .WithTitle("DisControl | Error")
@@ -380,7 +384,10 @@ public class VncCommands : BaseCommandModule
             _connection?.SendMessageAsync(new KeyEventMessage(false, i));
         }
         
-        if (!failed) await ScreenAction(ctx, msg);
+        if (!failed) {
+            await Task.Delay(1000);
+            await ScreenAction(ctx, msg);
+        }
     }
     
     public async Task MouseAction(CommandContext ctx, int x, int y, MouseButtons button)
@@ -395,7 +402,7 @@ public class VncCommands : BaseCommandModule
             return;
         }
 
-        if (VMware.GetState() != VMware.PowerState.poweredOn) {
+        if (VMware.State != VMware.PowerState.poweredOn) {
             var error = new DiscordEmbedBuilder()
                 .WithColor(DiscordColor.Yellow)
                 .WithTitle("DisControl | Error")
@@ -419,6 +426,7 @@ public class VncCommands : BaseCommandModule
         if (msg != null!) msg = await msg!.ModifyAsync(embed1);
         else msg = await ctx.RespondAsync(embed1);
         _connection?.SendMessageAsync(new PointerEventMessage(new Position(x, y), button));
+        await Task.Delay(1000);
         await ScreenAction(ctx, msg);
     }
 
