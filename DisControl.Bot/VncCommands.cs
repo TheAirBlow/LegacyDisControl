@@ -140,7 +140,7 @@ public class VncCommands : BaseCommandModule
             .Build();
         await msg.ModifyAsync(embed3);
         var file = new DiscordMessageBuilder()
-            .WithFile("screenshot.png", stream);
+            .WithFile("screenshot.png", stream, true);
         await msg.ModifyAsync(file);
         await msg.ModifyEmbedSuppressionAsync(true);
         await stream.DisposeAsync();
