@@ -147,6 +147,7 @@ public class VncCommands : BaseCommandModule
             return;
         
         _screen = true;
+        AnsiConsole.WriteLine(_connection?.RemoteFramebufferFormat.Name!);
         var embed2 = new DiscordEmbedBuilder()
             .WithColor(DiscordColor.Yellow)
             .WithTitle("DisControl | Screenshot")
