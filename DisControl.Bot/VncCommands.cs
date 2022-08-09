@@ -164,9 +164,9 @@ public class VncCommands : BaseCommandModule
         await msg.ModifyAsync(embed3);
         var file = new DiscordMessageBuilder()
             .WithFile(stream);
-        await stream.DisposeAsync();
         await msg.ModifyAsync(file);
         await msg.ModifyEmbedSuppressionAsync(true);
+        await stream.DisposeAsync();
         _screen = false;
     }
 
