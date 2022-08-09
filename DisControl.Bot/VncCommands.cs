@@ -33,7 +33,6 @@ public class VncCommands : BaseCommandModule
     
     private sealed class FramebufferReference : IFramebufferReference, IDisposable
     {
-        private volatile byte[]? _bitmap;
         private IntPtr _address;
         private Size _size;
         
@@ -45,8 +44,8 @@ public class VncCommands : BaseCommandModule
 
         internal unsafe FramebufferReference(byte[] bitmap, Size size)
         {
-            _address = (IntPtr)_bitmap.AsMemory().Pin().Pointer;
-            _bitmap = bitmap; _size = size;
+            _address = (IntPtr)bitmap.AsMemory().Pin().Pointer;
+            _size = size;
         }
 
         public void Dispose() { }
@@ -157,7 +156,6 @@ public class VncCommands : BaseCommandModule
         else msg = await ctx.RespondAsync(embed2);
         if (File.Exists("image.png"))
             File.Delete("image.png");
-        File.WriteAllBytes("data.bin", _target.Bitmap);
         using (var image = Image.LoadPixelData<Rgba32>(_target.Bitmap, _target.Size.Width, _target.Size.Height))
             await image.SaveAsPngAsync("image.png");
         var embed3 = new DiscordEmbedBuilder()
