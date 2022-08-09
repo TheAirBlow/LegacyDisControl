@@ -111,8 +111,43 @@ public class VncCommands : BaseCommandModule
         await message.ModifyAsync(embed2);
         return (message, false);
     }
+    
+    public async Task ScreenAction(CommandContext ctx, DiscordMessage msg = null!)
+    {
+        if (_connection == null || _connection.ConnectionState != ConnectionState.Connected) {
+            (msg, var error) = await Connect(ctx);
+            if (error) return;
+        }
 
-    [Command("screen")]
+        if (_screen) return;
+        
+        _screen = true;
+        var embed2 = new DiscordEmbedBuilder()
+            .WithColor(DiscordColor.Yellow)
+            .WithTitle("DisControl | Screenshot")
+            .AddField("Status", "Converting into PNG...")
+            .Build();
+        if (msg != null!) msg = await msg!.ModifyAsync(embed2);
+        else msg = await ctx.RespondAsync(embed2);
+        var stream = new MemoryStream();
+        using (var image = Image.LoadPixelData<Argb32>(_target.Bitmap,
+                   _target.Size.Width, _target.Size.Height))
+            await image.SaveAsPngAsync(stream);
+        var embed3 = new DiscordEmbedBuilder()
+            .WithColor(DiscordColor.Yellow)
+            .WithTitle("DisControl | Screenshot")
+            .AddField("Status", "Uploading...")
+            .Build();
+        await msg.ModifyAsync(embed3);
+        var file = new DiscordMessageBuilder()
+            .WithFile("screenshot.png", stream);
+        await msg.ModifyAsync(file);
+        await msg.ModifyEmbedSuppressionAsync(true);
+        await stream.DisposeAsync();
+        _screen = false;
+    }
+
+    [Command("screenshot")] [Aliases("screen", "s")]
     [Description("Get a screenshot")]
     [Cooldown(1, 5, CooldownBucketType.Global)]
     public async Task Screen(CommandContext ctx)
@@ -136,48 +171,11 @@ public class VncCommands : BaseCommandModule
             await ctx.RespondAsync(error);
             return;
         }
-        
-        DiscordMessage msg = null!;
-        if (_connection == null || _connection.ConnectionState != ConnectionState.Connected) {
-            (msg, var error) = await Connect(ctx);
-            if (error) return;
-        }
 
-        if (_screen)
-            return;
-        
-        _screen = true;
-        var embed2 = new DiscordEmbedBuilder()
-            .WithColor(DiscordColor.Yellow)
-            .WithTitle("DisControl | Screenshot")
-            .AddField("Status", "Saving file...")
-            .Build();
-        if (msg != null!) msg = await msg!.ModifyAsync(embed2);
-        else msg = await ctx.RespondAsync(embed2);
-        if (File.Exists("image.png"))
-            File.Delete("image.png");
-        using (var image = Image.LoadPixelData<Argb32>(_target.Bitmap, _target.Size.Width, _target.Size.Height))
-            await image.SaveAsPngAsync("image.png");
-        var embed3 = new DiscordEmbedBuilder()
-            .WithColor(DiscordColor.Yellow)
-            .WithTitle("DisControl | Screenshot")
-            .AddField("Status", "Uploading...")
-            .Build();
-        await msg.ModifyAsync(embed3);
-        var stream = new FileStream("image.png", 
-            FileMode.Open, FileAccess.ReadWrite);
-        var file = new DiscordMessageBuilder()
-            .WithFile("screenshot.png", stream);
-        await msg.ModifyAsync(file);
-        await msg.ModifyEmbedSuppressionAsync(true);
-        await stream.DisposeAsync();
-        _screen = false;
+        await ScreenAction(ctx);
     }
-
-    [Command("keycombo")]
-    [Description("Input a keycombo")]
-    [Cooldown(1, 5, CooldownBucketType.Global)]
-    public async Task KeyCombo(CommandContext ctx, [Description("Keys to press")] params string[] keys)
+    
+    public async Task KeyComboAction(CommandContext ctx, [Description("Keys to press")] params string[] keys)
     {
         if (string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
             var error = new DiscordEmbedBuilder()
@@ -237,115 +235,102 @@ public class VncCommands : BaseCommandModule
             failed = true;
         }
 
-        if (!failed) {
-            var embed2 = new DiscordEmbedBuilder()
-                .WithColor(DiscordColor.Green)
-                .WithTitle("DisControl | Print")
-                .AddField("Status", "Done!")
-                .Build();
-            await msg.ModifyAsync(embed2);
-        }
+        if (!failed) await ScreenAction(ctx, msg);
     }
+
+    [Command("keycombo")] [Aliases("key", "k")]
+    [Description("Input a keycombo")]
+    [Cooldown(1, 5, CooldownBucketType.Global)]
+    public async Task KeyCombo(CommandContext ctx, [Description("Keys to press")] params string[] keys)
+        => await KeyComboAction(ctx, keys);
     
-    [Command("enter")]
+    [Command("selectall")] [Aliases("all")]
+    [Description("Select all text (Ctrl + A)")]
+    [Cooldown(1, 5, CooldownBucketType.Global)]
+    public async Task SelectAll(CommandContext ctx)
+        => await KeyComboAction(ctx, "Control_L A");
+    
+    [Command("clear")] [Aliases("c")]
+    [Description("Select all text (Ctrl + A) and remove it (Backspace)")]
+    [Cooldown(1, 5, CooldownBucketType.Global)]
+    public async Task RemoveAllText(CommandContext ctx)
+        => await KeyComboAction(ctx, "Control_L A BackSpace");
+    
+    [Command("copy")] [Aliases("cp")]
+    [Description("Copy selected text (Ctrl + C)")]
+    [Cooldown(1, 5, CooldownBucketType.Global)]
+    public async Task Copy(CommandContext ctx)
+        => await KeyComboAction(ctx, "Control_L C");
+    
+    [Command("cut")] [Aliases("ct")]
+    [Description("Cut selected text (Ctrl + X)")]
+    [Cooldown(1, 5, CooldownBucketType.Global)]
+    public async Task Cut(CommandContext ctx)
+        => await KeyComboAction(ctx, "Control_L X");
+    
+    [Command("paste")] [Aliases("p")]
+    [Description("Cut selected text (Ctrl + X)")]
+    [Cooldown(1, 5, CooldownBucketType.Global)]
+    public async Task Paste(CommandContext ctx)
+        => await KeyComboAction(ctx, "Control_L V");
+    
+    private async Task KeyboardAction(CommandContext ctx, KeySymbol key)
+    {
+        if (string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
+            var error = new DiscordEmbedBuilder()
+                .WithColor(DiscordColor.Yellow)
+                .WithTitle("DisControl | Error")
+                .WithDescription("Current VM ID is not set!")
+                .Build();
+            await ctx.RespondAsync(error);
+            return;
+        }
+
+        if (VMware.GetState() != VMware.PowerState.poweredOn) {
+            var error = new DiscordEmbedBuilder()
+                .WithColor(DiscordColor.Yellow)
+                .WithTitle("DisControl | Error")
+                .WithDescription("VM is not powered on!")
+                .Build();
+            await ctx.RespondAsync(error);
+            return;
+        }
+        
+        DiscordMessage msg = null!;
+        if (_connection == null || _connection.ConnectionState != ConnectionState.Connected) {
+            (msg, var error) = await Connect(ctx);
+            if (error) return;
+        }
+        
+        var embed1 = new DiscordEmbedBuilder()
+            .WithColor(DiscordColor.Yellow)
+            .WithTitle("DisControl | Enter")
+            .AddField("Status", "Sending keys...")
+            .Build();
+        if (msg != null!) msg = await msg.ModifyAsync(embed1);
+        else msg = await ctx.RespondAsync(embed1);
+        _connection?.SendMessageAsync(new KeyEventMessage(true, key));
+        _connection?.SendMessageAsync(new KeyEventMessage(false, key));
+        await ScreenAction(ctx, msg);
+    }
+
+    [Command("enter")] [Aliases("e")]
     [Description("Press Enter key on the VM")]
     [Cooldown(1, 5, CooldownBucketType.Global)]
     public async Task Enter(CommandContext ctx)
-    {
-        if (string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
-            var error = new DiscordEmbedBuilder()
-                .WithColor(DiscordColor.Yellow)
-                .WithTitle("DisControl | Error")
-                .WithDescription("Current VM ID is not set!")
-                .Build();
-            await ctx.RespondAsync(error);
-            return;
-        }
-
-        if (VMware.GetState() != VMware.PowerState.poweredOn) {
-            var error = new DiscordEmbedBuilder()
-                .WithColor(DiscordColor.Yellow)
-                .WithTitle("DisControl | Error")
-                .WithDescription("VM is not powered on!")
-                .Build();
-            await ctx.RespondAsync(error);
-            return;
-        }
-        
-        DiscordMessage msg = null!;
-        if (_connection == null || _connection.ConnectionState != ConnectionState.Connected) {
-            (msg, var error) = await Connect(ctx);
-            if (error) return;
-        }
-        
-        var embed1 = new DiscordEmbedBuilder()
-            .WithColor(DiscordColor.Yellow)
-            .WithTitle("DisControl | Enter")
-            .AddField("Status", "Sending keys...")
-            .Build();
-        if (msg != null!) msg = await msg.ModifyAsync(embed1);
-        else msg = await ctx.RespondAsync(embed1);
-        _connection?.SendMessageAsync(new KeyEventMessage(true, KeySymbol.ISO_Enter));
-        _connection?.SendMessageAsync(new KeyEventMessage(false, KeySymbol.ISO_Enter));
-        var embed2 = new DiscordEmbedBuilder()
-            .WithColor(DiscordColor.Green)
-            .WithTitle("DisControl | Enter")
-            .AddField("Status", "Done!")
-            .Build();
-        await msg.ModifyAsync(embed2);
-    }
+        => await KeyboardAction(ctx, KeySymbol.KP_Enter);
     
-    [Command("rm")]
+    [Command("win")] [Aliases("w")]
+    [Description("Press Win key on the VM")]
+    [Cooldown(1, 5, CooldownBucketType.Global)]
+    public async Task Win(CommandContext ctx)
+        => await KeyboardAction(ctx, KeySymbol.Super_L);
+
+    [Command("backspace")] [Aliases("rm", "del", "back")]
     [Description("Press Backspace key on the VM")]
     [Cooldown(1, 5, CooldownBucketType.Global)]
     public async Task Backspace(CommandContext ctx, [Description("How many times")] int count)
-    {
-        if (string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
-            var error = new DiscordEmbedBuilder()
-                .WithColor(DiscordColor.Yellow)
-                .WithTitle("DisControl | Error")
-                .WithDescription("Current VM ID is not set!")
-                .Build();
-            await ctx.RespondAsync(error);
-            return;
-        }
-
-        if (VMware.GetState() != VMware.PowerState.poweredOn) {
-            var error = new DiscordEmbedBuilder()
-                .WithColor(DiscordColor.Yellow)
-                .WithTitle("DisControl | Error")
-                .WithDescription("VM is not powered on!")
-                .Build();
-            await ctx.RespondAsync(error);
-            return;
-        }
-        
-        DiscordMessage msg = null!;
-        if (_connection == null || _connection.ConnectionState != ConnectionState.Connected) {
-            (msg, var error) = await Connect(ctx);
-            if (error) return;
-        }
-
-        var embed1 = new DiscordEmbedBuilder()
-            .WithColor(DiscordColor.Yellow)
-            .WithTitle("DisControl | Backspace")
-            .AddField("Status", "Sending keys...")
-            .Build();
-        if (msg != null!) msg = await msg.ModifyAsync(embed1);
-        else msg = await ctx.RespondAsync(embed1);
-
-        for (var i = 0; i < count; i++) {
-            _connection?.SendMessageAsync(new KeyEventMessage(true, KeySymbol.BackSpace));
-            _connection?.SendMessageAsync(new KeyEventMessage(false, KeySymbol.BackSpace));
-        }
-
-        var embed2 = new DiscordEmbedBuilder()
-            .WithColor(DiscordColor.Green)
-            .WithTitle("DisControl | Backspace")
-            .AddField("Status", "Done!")
-            .Build();
-        await msg.ModifyAsync(embed2);
-    }
+        => await KeyboardAction(ctx, KeySymbol.BackSpace);
     
     [Command("print")]
     [Description("Print some text")]
@@ -387,38 +372,17 @@ public class VncCommands : BaseCommandModule
         else msg = await ctx.RespondAsync(embed1);
         var failed = false;
 
-        try {
-            var enumKeys = text.ToArray().Select(DataSet.FromUnicode);
-            var keySyms = enumKeys as KeySymbol[] ?? enumKeys.ToArray();
-            foreach (var i in keySyms) {
-                _connection?.SendMessageAsync(new KeyEventMessage(true, i));
-                _connection?.SendMessageAsync(new KeyEventMessage(false, i));
-            }
-        } catch (Exception e) {
-            var embed = new DiscordEmbedBuilder()
-                .WithColor(DiscordColor.Red)
-                .WithTitle("DisControl | Error")
-                .AddField("Message", $"Unable to parse {e.Message}!")
-                .AddField("Additional", "[Click here](https://bit.ly/3dji1Zx)")
-                .Build();
-            await msg.ModifyAsync(embed);
-            failed = true;
+        var enumKeys = text.ToArray().Select(DataSet.FromUnicode);
+        var keySyms = enumKeys as KeySymbol[] ?? enumKeys.ToArray();
+        foreach (var i in keySyms) {
+            _connection?.SendMessageAsync(new KeyEventMessage(true, i));
+            _connection?.SendMessageAsync(new KeyEventMessage(false, i));
         }
         
-        if (!failed) {
-            var embed2 = new DiscordEmbedBuilder()
-                .WithColor(DiscordColor.Green)
-                .WithTitle("DisControl | Print")
-                .AddField("Status", "Done!")
-                .Build();
-            await msg.ModifyAsync(embed2);
-        }
+        if (!failed) await ScreenAction(ctx, msg);
     }
     
-    [Command("mouse")]
-    [Description("Move mouse")]
-    [Cooldown(1, 2, CooldownBucketType.Global)]
-    public async Task Mouse(CommandContext ctx, [Description("Mouse X position")] int x, [Description("Mouse Y position")] int y)
+    public async Task MouseAction(CommandContext ctx, int x, int y, MouseButtons button)
     {
         if (string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
             var error = new DiscordEmbedBuilder()
@@ -453,246 +417,43 @@ public class VncCommands : BaseCommandModule
             .Build();
         if (msg != null!) msg = await msg!.ModifyAsync(embed1);
         else msg = await ctx.RespondAsync(embed1);
-        _connection?.SendMessageAsync(new PointerEventMessage(new Position(x, y), MouseButtons.None));
-        var embed2 = new DiscordEmbedBuilder()
-            .WithColor(DiscordColor.Green)
-            .WithTitle("DisControl | Move Mouse")
-            .AddField("Status", "Done!")
-            .Build();
-        await msg.ModifyAsync(embed2);
+        _connection?.SendMessageAsync(new PointerEventMessage(new Position(x, y), button));
+        await ScreenAction(ctx, msg);
     }
+
+    [Command("mouse")]
+    [Description("Move mouse")]
+    [Cooldown(1, 2, CooldownBucketType.Global)]
+    public async Task Mouse(CommandContext ctx, [Description("Mouse X position")] int x, [Description("Mouse Y position")] int y)
+        => await MouseAction(ctx, x, y, MouseButtons.None);
 
     [Command("leftclick")]
     [Description("Left mouse click")]
     [Cooldown(1, 2, CooldownBucketType.Global)]
     public async Task LeftClick(CommandContext ctx, [Description("Mouse X position")] int x, [Description("Mouse Y position")] int y)
-    {
-        if (string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
-            var error = new DiscordEmbedBuilder()
-                .WithColor(DiscordColor.Yellow)
-                .WithTitle("DisControl | Error")
-                .WithDescription("Current VM ID is not set!")
-                .Build();
-            await ctx.RespondAsync(error);
-            return;
-        }
-
-        if (VMware.GetState() != VMware.PowerState.poweredOn) {
-            var error = new DiscordEmbedBuilder()
-                .WithColor(DiscordColor.Yellow)
-                .WithTitle("DisControl | Error")
-                .WithDescription("VM is not powered on!")
-                .Build();
-            await ctx.RespondAsync(error);
-            return;
-        }
-        
-        DiscordMessage msg = null!;
-        if (_connection == null || _connection.ConnectionState != ConnectionState.Connected) {
-            (msg, var error) = await Connect(ctx);
-            if (error) return;
-        }
-
-        var embed1 = new DiscordEmbedBuilder()
-            .WithColor(DiscordColor.Yellow)
-            .WithTitle("DisControl | Left Click")
-            .AddField("Status", "Sending...")
-            .Build();
-        if (msg != null!) msg = await msg.ModifyAsync(embed1);
-        else msg = await ctx.RespondAsync(embed1);
-        _connection?.SendMessageAsync(new PointerEventMessage(new Position(x, y), MouseButtons.Left));
-        var embed2 = new DiscordEmbedBuilder()
-            .WithColor(DiscordColor.Green)
-            .WithTitle("DisControl | Left Click")
-            .AddField("Status", "Done!")
-            .Build();
-        await msg.ModifyAsync(embed2);
-    }
+        => await MouseAction(ctx, x, y, MouseButtons.Left);
     
     [Command("rightclick")]
     [Description("Right mouse click")]
     [Cooldown(1, 2, CooldownBucketType.Global)]
     public async Task RightClick(CommandContext ctx, [Description("Mouse X position")] int x, [Description("Mouse Y position")] int y)
-    {
-        if (string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
-            var error = new DiscordEmbedBuilder()
-                .WithColor(DiscordColor.Yellow)
-                .WithTitle("DisControl | Error")
-                .WithDescription("Current VM ID is not set!")
-                .Build();
-            await ctx.RespondAsync(error);
-            return;
-        }
-
-        if (VMware.GetState() != VMware.PowerState.poweredOn) {
-            var error = new DiscordEmbedBuilder()
-                .WithColor(DiscordColor.Yellow)
-                .WithTitle("DisControl | Error")
-                .WithDescription("VM is not powered on!")
-                .Build();
-            await ctx.RespondAsync(error);
-            return;
-        }
-        
-        DiscordMessage msg = null!;
-        if (_connection == null || _connection.ConnectionState != ConnectionState.Connected) {
-            (msg, var error) = await Connect(ctx);
-            if (error) return;
-        }
-        var embed1 = new DiscordEmbedBuilder()
-            .WithColor(DiscordColor.Yellow)
-            .WithTitle("DisControl | Right Click")
-            .AddField("Status", "Sending...")
-            .Build();
-        if (msg != null!) msg = await msg.ModifyAsync(embed1);
-        else msg = await ctx.RespondAsync(embed1);
-        _connection?.SendMessageAsync(new PointerEventMessage(new Position(x, y), MouseButtons.Right));
-        var embed2 = new DiscordEmbedBuilder()
-            .WithColor(DiscordColor.Green)
-            .WithTitle("DisControl | Right Click")
-            .AddField("Status", "Done!")
-            .Build();
-        await msg.ModifyAsync(embed2);
-    }
+        => await MouseAction(ctx, x, y, MouseButtons.Right);
     
     [Command("middleclick")]
     [Description("Middle mouse click")]
     [Cooldown(1, 2, CooldownBucketType.Global)]
     public async Task MiddleClick(CommandContext ctx, [Description("Mouse X position")] int x, [Description("Mouse Y position")] int y)
-    {
-        if (string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
-            var error = new DiscordEmbedBuilder()
-                .WithColor(DiscordColor.Yellow)
-                .WithTitle("DisControl | Error")
-                .WithDescription("Current VM ID is not set!")
-                .Build();
-            await ctx.RespondAsync(error);
-            return;
-        }
-
-        if (VMware.GetState() != VMware.PowerState.poweredOn) {
-            var error = new DiscordEmbedBuilder()
-                .WithColor(DiscordColor.Yellow)
-                .WithTitle("DisControl | Error")
-                .WithDescription("VM is not powered on!")
-                .Build();
-            await ctx.RespondAsync(error);
-            return;
-        }
-        
-        DiscordMessage msg = null!;
-        if (_connection == null || _connection.ConnectionState != ConnectionState.Connected) {
-            (msg, var error) = await Connect(ctx);
-            if (error) return;
-        }
-
-        var embed1 = new DiscordEmbedBuilder()
-            .WithColor(DiscordColor.Yellow)
-            .WithTitle("DisControl | Middle Click")
-            .AddField("Status", "Sending...")
-            .Build();
-        if (msg != null!) msg = await msg.ModifyAsync(embed1);
-        else msg = await ctx.RespondAsync(embed1);
-        _connection?.SendMessageAsync(new PointerEventMessage(new Position(x, y), MouseButtons.Middle));
-        var embed2 = new DiscordEmbedBuilder()
-            .WithColor(DiscordColor.Green)
-            .WithTitle("DisControl | Middle Click")
-            .AddField("Status", "Done!")
-            .Build();
-        await msg.ModifyAsync(embed2);
-    }
+        => await MouseAction(ctx, x, y, MouseButtons.Middle);
     
     [Command("scrollup")]
     [Description("Scroll up mouse")]
     [Cooldown(1, 2, CooldownBucketType.Global)]
     public async Task ScrollUp(CommandContext ctx, [Description("Mouse X position")] int x, [Description("Mouse Y position")] int y)
-    {
-        if (string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
-            var error = new DiscordEmbedBuilder()
-                .WithColor(DiscordColor.Yellow)
-                .WithTitle("DisControl | Error")
-                .WithDescription("Current VM ID is not set!")
-                .Build();
-            await ctx.RespondAsync(error);
-            return;
-        }
-
-        if (VMware.GetState() != VMware.PowerState.poweredOn) {
-            var error = new DiscordEmbedBuilder()
-                .WithColor(DiscordColor.Yellow)
-                .WithTitle("DisControl | Error")
-                .WithDescription("VM is not powered on!")
-                .Build();
-            await ctx.RespondAsync(error);
-            return;
-        }
-        
-        DiscordMessage msg = null!;
-        if (_connection == null || _connection.ConnectionState != ConnectionState.Connected) {
-            (msg, var error) = await Connect(ctx);
-            if (error) return;
-        }
-
-        var embed1 = new DiscordEmbedBuilder()
-            .WithColor(DiscordColor.Yellow)
-            .WithTitle("DisControl | Scroll Up")
-            .AddField("Status", "Sending...")
-            .Build();
-        if (msg != null!) msg = await msg!.ModifyAsync(embed1);
-        else msg = await ctx.RespondAsync(embed1);
-        _connection?.SendMessageAsync(new PointerEventMessage(new Position(x, y), MouseButtons.WheelUp));
-        var embed2 = new DiscordEmbedBuilder()
-            .WithColor(DiscordColor.Green)
-            .WithTitle("DisControl | Scroll Up")
-            .AddField("Status", "Done!")
-            .Build();
-        await msg.ModifyAsync(embed2);
-    }
+        => await MouseAction(ctx, x, y, MouseButtons.WheelUp);
     
     [Command("scrolldown")]
     [Description("Scroll Down mouse")]
     [Cooldown(1, 2, CooldownBucketType.Global)]
     public async Task ScrollDown(CommandContext ctx, [Description("Mouse X position")] int x, [Description("Mouse Y position")] int y)
-    {
-        if (string.IsNullOrEmpty(Configuration.Config.CurrentId)) {
-            var error = new DiscordEmbedBuilder()
-                .WithColor(DiscordColor.Yellow)
-                .WithTitle("DisControl | Error")
-                .WithDescription("Current VM ID is not set!")
-                .Build();
-            await ctx.RespondAsync(error);
-            return;
-        }
-
-        if (VMware.GetState() != VMware.PowerState.poweredOn) {
-            var error = new DiscordEmbedBuilder()
-                .WithColor(DiscordColor.Yellow)
-                .WithTitle("DisControl | Error")
-                .WithDescription("VM is not powered on!")
-                .Build();
-            await ctx.RespondAsync(error);
-            return;
-        }
-        
-        DiscordMessage msg = null!;
-        if (_connection == null || _connection.ConnectionState != ConnectionState.Connected) {
-            (msg, var error) = await Connect(ctx);
-            if (error) return;
-        }
-        
-        var embed1 = new DiscordEmbedBuilder()
-            .WithColor(DiscordColor.Yellow)
-            .WithTitle("DisControl | Scroll Down")
-            .AddField("Status", "Sending...")
-            .Build();
-        if (msg != null!) msg = await msg.ModifyAsync(embed1);
-        else msg = await ctx.RespondAsync(embed1);
-        _connection?.SendMessageAsync(new PointerEventMessage(new Position(x, y), MouseButtons.WheelDown));
-        var embed2 = new DiscordEmbedBuilder()
-            .WithColor(DiscordColor.Green)
-            .WithTitle("DisControl | Scroll Down")
-            .AddField("Status", "Done!")
-            .Build();
-        await msg.ModifyAsync(embed2);
-    }
+        => await MouseAction(ctx, x, y, MouseButtons.WheelDown);
 }

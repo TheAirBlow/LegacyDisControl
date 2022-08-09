@@ -7,7 +7,7 @@ namespace DisControl.Bot;
 
 public class NgrokCommands : BaseCommandModule
 {
-    [Command("tunnelstart")]
+    [Command("tunnelstart")] [Aliases("tst")]
     [Description("Start ngrok tunnel")]
     public async Task StartTunnel(CommandContext ctx)
     {
@@ -66,7 +66,7 @@ public class NgrokCommands : BaseCommandModule
         await message.ModifyAsync(embed4);
     }
     
-    [Command("tunnelstop")]
+    [Command("tunnelstop")] [Aliases("tso")]
     [Description("Stop ngrok tunnel")]
     public async Task StopTunnel(CommandContext ctx)
     {

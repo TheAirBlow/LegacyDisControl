@@ -14,23 +14,10 @@ public static class DiscordLogs
         try {
             _guild = await Discord.Client.GetGuildAsync(Configuration.Config.GuildId);
             _logs = _guild.GetChannel(Configuration.Config.LogsChannelId);
-
-            var cur = Configuration.Config.CurrentId;
-            var par = Configuration.Config.ParentId;
-            var embed = new DiscordEmbedBuilder()
-                .WithColor(DiscordColor.Green)
-                .WithTitle("DisControl | Started")
-                .AddField("Current ID", string.IsNullOrEmpty(cur) ? "Empty" : cur)
-                .AddField("Parent ID", string.IsNullOrEmpty(par) ? "Empty" : par)
-                .AddField("Version", "v1.2.1")
-                .Build();
-            await new DiscordMessageBuilder()
-                .WithEmbed(embed).SendAsync(_logs);
         } catch (Exception e) {
             AnsiConsole.MarkupLine("[red]Task Failed: An exception occured.[/]");
             AnsiConsole.WriteException(e); Console.ReadKey(); Environment.Exit(0);
         }
-        AnsiConsole.MarkupLine("[green]Task successfully finished![/]");
     }
 
     /// <summary>

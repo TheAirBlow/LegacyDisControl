@@ -24,7 +24,6 @@ public static class DataSet
             AnsiConsole.MarkupLine("[red]Task Failed: An exception occured.[/]");
             AnsiConsole.WriteException(e); Console.ReadKey(); Environment.Exit(0);
         }
-        AnsiConsole.MarkupLine("[green]Task successfully finished![/]");
     }
 
     public static KeySymbol FromUnicode(char input)

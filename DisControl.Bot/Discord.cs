@@ -32,12 +32,12 @@ public static class Discord
             AnsiConsole.MarkupLine("[red]Task Failed: An exception occured.[/]");
             AnsiConsole.WriteException(e); Console.ReadKey(); Environment.Exit(0);
         }
-        AnsiConsole.MarkupLine("[green]Task successfully finished![/]");
     }
     
     private static async Task CommandErroredHandler(CommandsNextExtension _, CommandErrorEventArgs e)
     {
         switch (e.Exception) {
+            
             case CommandNotFoundException:
                 var p = Configuration.Config.BotPrefix;
                 var embed4 = new DiscordEmbedBuilder()

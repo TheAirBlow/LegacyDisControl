@@ -10,7 +10,7 @@ namespace DisControl.Bot;
 /// </summary>
 public class Commands : BaseCommandModule
 {
-    [Command("autorestart")]
+    [Command("autorestart")] [Aliases("ar")]
     [Description("Current VM's information")]
     public async Task AutoRestartMethod(CommandContext ctx, [Description("Enable or disable")] bool enabled)
     {
@@ -45,7 +45,7 @@ public class Commands : BaseCommandModule
         await ctx.RespondAsync(embed2);
     }
 
-    [Command("info")]
+    [Command("info")] [Aliases("iw")]
     [Description("Current VM's information")]
     public async Task Info(CommandContext ctx)
     {
@@ -101,7 +101,7 @@ public class Commands : BaseCommandModule
         await message.ModifyAsync(embed);
     }
     
-    [Command("setstate")]
+    [Command("setstate")] [Aliases("ss")]
     [Description("Sets power state of Current ID")]
     public async Task SetState(CommandContext ctx, [Description("VM Power State (on, off, pause, suspend)")] string state)
     {
@@ -155,7 +155,7 @@ public class Commands : BaseCommandModule
         await message.ModifyAsync(embed4);
     }
     
-    [Command("setparent")]
+    [Command("setparent")] [Aliases("sp")]
     [Description("Sets the Parent ID")]
     public async Task SetParent(CommandContext ctx, [Description("Parent ID")] string parent)
     {
@@ -180,7 +180,7 @@ public class Commands : BaseCommandModule
         await ctx.RespondAsync(embed1);
     }
     
-    [Command("setcurrent")]
+    [Command("setcurrent")] [Aliases("sc")]
     [Description("Sets the Current ID")]
     public async Task SetCurrent(CommandContext ctx, [Description("Current ID")] string current)
     {
@@ -205,7 +205,7 @@ public class Commands : BaseCommandModule
         await ctx.RespondAsync(embed1);
     }
     
-    [Command("delete")]
+    [Command("delete")] [Aliases("vdel", "vd")]
     [Description("Delete Current VM")] 
     public async Task Delete(CommandContext ctx)
     {
@@ -263,7 +263,7 @@ public class Commands : BaseCommandModule
         await message.ModifyAsync(embed4);
     }
     
-    [Command("create")]
+    [Command("create")] [Aliases("cr")]
     [Description("Create a new VM")]
     public async Task Create(CommandContext ctx)
     {
@@ -311,7 +311,7 @@ public class Commands : BaseCommandModule
         await message.ModifyAsync(embed4);
     }
 
-    [Command("reset")]
+    [Command("reset")] [Aliases("rs")]
     [Description("Delete Current VM and create a new one")]
     public async Task Reset(CommandContext ctx)
     {
