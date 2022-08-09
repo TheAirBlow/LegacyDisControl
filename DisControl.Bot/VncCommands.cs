@@ -62,7 +62,7 @@ public class VncCommands : BaseCommandModule
             byte[]? bitmap;
             if (Size == null) Size = size;
             if (Bitmap == null || Size != size) {
-                bitmap = new byte[size.Width * size.Height * Unsafe.SizeOf<Rgb24>()];
+                bitmap = new byte[size.Width * size.Height * Unsafe.SizeOf<Abgr32>()];
                 lock (_bitmapReplacementLock)
                     Bitmap = bitmap;
 
@@ -127,10 +127,10 @@ public class VncCommands : BaseCommandModule
             .WithTitle("DisControl | Screenshot")
             .AddField("Status", "Converting into PNG...")
             .Build();
-        if (msg != null!) msg = await msg!.ModifyAsync(embed2);
+        if (msg != null!) msg = await msg.ModifyAsync(embed2);
         else msg = await ctx.RespondAsync(embed2);
         var stream = new MemoryStream();
-        using (var image = Image.LoadPixelData<Rgb24>(_target.Bitmap,
+        using (var image = Image.LoadPixelData<Abgr32>(_target.Bitmap,
                    _target.Size.Width, _target.Size.Height))
             await image.SaveAsPngAsync(stream);
         var embed3 = new DiscordEmbedBuilder()
