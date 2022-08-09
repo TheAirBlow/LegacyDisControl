@@ -62,7 +62,7 @@ public class VncCommands : BaseCommandModule
             byte[]? bitmap;
             if (Size == null) Size = size;
             if (Bitmap == null || Size != size) {
-                bitmap = new byte[size.Width * size.Height * Unsafe.SizeOf<Argb32>()];
+                bitmap = new byte[size.Width * size.Height * Unsafe.SizeOf<Rgb24>()];
                 lock (_bitmapReplacementLock)
                     Bitmap = bitmap;
 
@@ -130,7 +130,7 @@ public class VncCommands : BaseCommandModule
         if (msg != null!) msg = await msg!.ModifyAsync(embed2);
         else msg = await ctx.RespondAsync(embed2);
         var stream = new MemoryStream();
-        using (var image = Image.LoadPixelData<Argb32>(_target.Bitmap,
+        using (var image = Image.LoadPixelData<Rgb24>(_target.Bitmap,
                    _target.Size.Width, _target.Size.Height))
             await image.SaveAsPngAsync(stream);
         var embed3 = new DiscordEmbedBuilder()
@@ -139,8 +139,9 @@ public class VncCommands : BaseCommandModule
             .AddField("Status", "Uploading...")
             .Build();
         await msg.ModifyAsync(embed3);
+        stream.Position = 0;
         var file = new DiscordMessageBuilder()
-            .WithFile("screenshot.png", stream, true);
+            .WithFile("screenshot.png", stream);
         await msg.ModifyAsync(file);
         await msg.ModifyEmbedSuppressionAsync(true);
         await stream.DisposeAsync();
