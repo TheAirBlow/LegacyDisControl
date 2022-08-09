@@ -59,7 +59,7 @@ public class VncCommands : BaseCommandModule
     }
     
     private VncClient _client = new(new NullLoggerFactory());
-    private RfbConnection _connection;
+    private RfbConnection? _connection;
     private RenderTarget _target = new();
     private volatile bool _screen = false;
     
@@ -130,7 +130,7 @@ public class VncCommands : BaseCommandModule
         }
         
         DiscordMessage msg = null!;
-        if (_connection.ConnectionState != ConnectionState.Connected) {
+        if (_connection == null || _connection.ConnectionState != ConnectionState.Connected) {
             (msg, var error) = await Connect(ctx);
             if (error) return;
         }
@@ -192,7 +192,7 @@ public class VncCommands : BaseCommandModule
         }
         
         DiscordMessage msg = null!;
-        if (_connection.ConnectionState != ConnectionState.Connected) {
+        if (_connection == null || _connection.ConnectionState != ConnectionState.Connected) {
             (msg, var error) = await Connect(ctx);
             if (error) return;
         }
@@ -265,7 +265,7 @@ public class VncCommands : BaseCommandModule
         }
         
         DiscordMessage msg = null!;
-        if (_connection.ConnectionState != ConnectionState.Connected) {
+        if (_connection == null || _connection.ConnectionState != ConnectionState.Connected) {
             (msg, var error) = await Connect(ctx);
             if (error) return;
         }
@@ -313,7 +313,7 @@ public class VncCommands : BaseCommandModule
         }
         
         DiscordMessage msg = null!;
-        if (_connection.ConnectionState != ConnectionState.Connected) {
+        if (_connection == null || _connection.ConnectionState != ConnectionState.Connected) {
             (msg, var error) = await Connect(ctx);
             if (error) return;
         }
@@ -365,7 +365,7 @@ public class VncCommands : BaseCommandModule
         }
         
         DiscordMessage msg = null!;
-        if (_connection.ConnectionState != ConnectionState.Connected) {
+        if (_connection == null || _connection.ConnectionState != ConnectionState.Connected) {
             (msg, var error) = await Connect(ctx);
             if (error) return;
         }
@@ -433,7 +433,7 @@ public class VncCommands : BaseCommandModule
         }
         
         DiscordMessage msg = null!;
-        if (_connection.ConnectionState != ConnectionState.Connected) {
+        if (_connection == null || _connection.ConnectionState != ConnectionState.Connected) {
             (msg, var error) = await Connect(ctx);
             if (error) return;
         }
@@ -480,7 +480,7 @@ public class VncCommands : BaseCommandModule
         }
         
         DiscordMessage msg = null!;
-        if (_connection.ConnectionState != ConnectionState.Connected) {
+        if (_connection == null || _connection.ConnectionState != ConnectionState.Connected) {
             (msg, var error) = await Connect(ctx);
             if (error) return;
         }
@@ -527,7 +527,7 @@ public class VncCommands : BaseCommandModule
         }
         
         DiscordMessage msg = null!;
-        if (_connection.ConnectionState != ConnectionState.Connected) {
+        if (_connection == null || _connection.ConnectionState != ConnectionState.Connected) {
             (msg, var error) = await Connect(ctx);
             if (error) return;
         }
@@ -574,7 +574,7 @@ public class VncCommands : BaseCommandModule
         }
         
         DiscordMessage msg = null!;
-        if (_connection.ConnectionState != ConnectionState.Connected) {
+        if (_connection == null || _connection.ConnectionState != ConnectionState.Connected) {
             (msg, var error) = await Connect(ctx);
             if (error) return;
         }
@@ -621,7 +621,7 @@ public class VncCommands : BaseCommandModule
         }
         
         DiscordMessage msg = null!;
-        if (_connection.ConnectionState != ConnectionState.Connected) {
+        if (_connection == null || _connection.ConnectionState != ConnectionState.Connected) {
             (msg, var error) = await Connect(ctx);
             if (error) return;
         }
@@ -668,7 +668,7 @@ public class VncCommands : BaseCommandModule
         }
         
         DiscordMessage msg = null!;
-        if (_connection.ConnectionState != ConnectionState.Connected) {
+        if (_connection == null || _connection.ConnectionState != ConnectionState.Connected) {
             (msg, var error) = await Connect(ctx);
             if (error) return;
         }
