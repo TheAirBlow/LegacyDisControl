@@ -157,7 +157,7 @@ public class VncCommands : BaseCommandModule
         var stream = new FileStream("image.jpg", 
             FileMode.CreateNew, FileAccess.ReadWrite);
         using var wstream = new SKManagedWStream(stream);
-        _target._bitmap?.Encode(wstream, SKEncodedImageFormat.Png, 0);
+        _target._bitmap?.Encode(wstream, SKEncodedImageFormat.Jpeg, 0);
         var embed3 = new DiscordEmbedBuilder()
             .WithColor(DiscordColor.Yellow)
             .WithTitle("DisControl | Screenshot")
