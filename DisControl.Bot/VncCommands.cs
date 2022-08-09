@@ -5,7 +5,9 @@ using DSharpPlus.Entities;
 using MarcusW.VncClient;
 using MarcusW.VncClient.Protocol.Implementation.MessageTypes.Outgoing;
 using MarcusW.VncClient.Protocol.Implementation.Services.Transports;
+using MarcusW.VncClient.Protocol.SecurityTypes;
 using MarcusW.VncClient.Rendering;
+using MarcusW.VncClient.Security;
 using Microsoft.Extensions.Logging.Abstractions;
 using SkiaSharp;
 using Spectre.Console;
@@ -15,6 +17,17 @@ namespace DisControl.Bot;
 
 public class VncCommands : BaseCommandModule
 {
+    private class DemoAuthenticationHandler : IAuthenticationHandler
+    {
+        public async Task<TInput> ProvideAuthenticationInputAsync<TInput>(RfbConnection connection, ISecurityType securityType, IAuthenticationInputRequest<TInput> request)
+            where TInput : class, IAuthenticationInput {
+            if (typeof(TInput) == typeof(PasswordAuthenticationInput))
+                throw new InvalidOperationException("The authentication input request is not supported by this authentication handler.");
+            
+            return (TInput)Convert.ChangeType(new PasswordAuthenticationInput(""), typeof(TInput));
+        }
+    }
+    
     private sealed class FramebufferReference : IFramebufferReference
     {
         private volatile SKBitmap? _bitmap;
@@ -75,7 +88,8 @@ public class VncCommands : BaseCommandModule
         try { 
             _connection = await _client.ConnectAsync(new ConnectParameters {
                 ConnectTimeout = TimeSpan.FromSeconds(5),
-                MaxReconnectAttempts = 5, 
+                MaxReconnectAttempts = 5,
+                AuthenticationHandler = new Authentica,
                 TransportParameters = new TcpTransportParameters {
                     Host = VMware.GetHostIP(),
                     Port = 5901

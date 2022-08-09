@@ -49,14 +49,7 @@ public static class Discord
                 await e.Context.RespondAsync(embed4);
                 return;
             default:
-                var embed5 = new DiscordEmbedBuilder()
-                    .WithColor(DiscordColor.Red)
-                    .WithTitle("DisControl | Error")
-                    .AddField("Message", "An exception occured!")
-                    .AddField("Additional", "Check logs for more information.")
-                    .Build();
-                AnsiConsole.WriteException(e.Exception);
-                await e.Context.RespondAsync(embed5);
+                await e.Context.RespondAsync($"```csharp\n{e.Exception}```");
                 return;
         }
     }
